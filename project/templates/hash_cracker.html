@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hash Cracker</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            height: 100vh;
+            background: #020617;
+            position: fixed;
+            padding-top: 20px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background: #1e293b;
+        }
+        /* COLLAPSED STATE */
+        .sidebar.collapsed {
+        width: 70px;
+        }
+
+        /* Main Content */
+        .main {
+            margin-left: 220px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        input, select, button {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            background: #22c55e;
+            color: white;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .box {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>💻 Cyber Tools</h2>
+
+    <a href="/dashboard">📁 File Locker</a>
+    <a href="/hash-cracker">🔓 Hash Cracker</a>
+    <a href="#">🔑 Password Checker</a>
+    <a href="#">🧠 Base64 Tool</a>
+    <a href="#">🌐 URL Scanner</a>
+
+    <a href="/logout">🚪 Logout</a>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+    <div class="box">
+        <h2>🔓 Hash Cracker</h2>
+
+        <form method="post">
+            <input type="text" name="hash" placeholder="Enter hash" required><br>
+
+            <select name="algo">
+                <option value="md5">MD5</option>
+                <option value="sha256">SHA256</option>
+            </select><br>
+
+            <button type="submit">Crack Hash 🚀</button>
+        </form>
+
+        {% if result %}
+            <div class="result">{{ result }}</div>
+        {% endif %}
+    </div>
+
+</div>
+</body>
+</html>

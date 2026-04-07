@@ -1,0 +1,155 @@
+CSS
+
+
+/* ===== BASE ===== */
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    display: flex;
+}
+/* TOP BAR ALIGNMENT */
+.top-bar form {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.top-bar {
+    margin-bottom: 35px;
+}
+/* FILE INPUT */
+input[type="file"] {
+    background: #1e293b;
+    color: white;
+    padding: 5px;
+    border-radius: 6px;
+}
+
+/* KEY INPUT */
+#key {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: none;
+    background: #1e293b;
+    color: white;
+    width: 160px;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    width: 220px;
+    height: 100vh;
+    background: #020617;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding-top: 20px;
+    transition: 0.3s;
+}
+
+/* COLLAPSED STATE */
+.sidebar.collapsed {
+    width: 70px;
+}
+
+/* LOGO */
+.logo {
+    text-align: center;
+    font-size: 18px;
+}
+
+/* LINKS */
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    color: white;
+    text-decoration: none;
+}
+
+.sidebar a:hover {
+    background: #1e293b;
+}
+
+/* HIDE TEXT WHEN COLLAPSED */
+.sidebar.collapsed span {
+    display: none;
+}
+
+/* ===== MAIN ===== */
+.main {
+    margin-left: 220px;
+    padding: 20px;
+    width: calc(100% - 220px);
+    transition: 0.3s;
+}
+
+/* SHIFT MAIN WHEN COLLAPSED */
+.main.collapsed {
+    margin-left: 70px;
+    width: calc(100% - 70px);
+}
+
+/* ===== TOGGLE BUTTON ===== */
+.toggle-btn {
+    background: #22c55e;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+/* ===== FILE UI (KEEP YOURS) ===== */
+.file-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e293b;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+.file-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e293b;
+    padding: 12px 15px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+
+    /* IMPORTANT */
+    transition: all 0.3s ease;
+}
+
+/* 🔥 HOVER EFFECT */
+.file-row:hover {
+    transform: translateY(-5px);
+    background: #24364d;
+    box-shadow: 0 10px 25px rgba(0, 255, 200, 0.2);
+}
+
+.file-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.encrypt { background: #22c55e; }
+.decrypt { background: #f59e0b; }
+.download { background: #3b82f6; }
+.delete { background: #ef4444; }
+
+.status.normal { background: #14532d; padding: 5px 10px; border-radius: 6px; }
+.status.encrypted { background: #7f1d1d; padding: 5px 10px; border-radius: 6px; }

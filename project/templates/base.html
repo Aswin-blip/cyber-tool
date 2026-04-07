@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cyber Tools</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar" class="sidebar">
+    <h2 class="logo">💻 Cyber Tools</h2>
+
+    <a href="/dashboard">📁 <span>File Locker</span></a>
+    <a href="/hash-cracker">🔓 <span>Hash Cracker</span></a>
+    <a href="/password-checker">🔑 <span>Password Checker</span></a>
+    <a href="/base64">🧠 <span>Base64 Tool</span></a>
+    <a href="/url-scanner">🌐 <span>URL Scanner</span></a>
+    <a href="/logout">🚪 <span>Logout</span></a>
+</div>
+
+<!-- MAIN -->
+<div id="main" class="main">
+
+    <!-- TOGGLE BUTTON -->
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+    {% block content %}{% endblock %}
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>

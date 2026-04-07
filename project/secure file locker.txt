@@ -1,0 +1,377 @@
+app.py
+from flask import Flask, request, render_template, redirect, url_for, session, send_from_directory
+import os
+
+app = Flask(__name__)
+app.secret_key = "secret123"
+
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+USERNAME = "admin"
+PASSWORD = "1234"
+
+# ---------------- LOGIN ----------------
+@app.route("/", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        user = request.form["username"]
+        pwd = request.form["password"]
+
+        if user == USERNAME and pwd == PASSWORD:
+            session["user"] = user
+            return redirect("/dashboard")
+        else:
+            return "Invalid Credentials ❌"
+
+    return render_template("login.html")
+
+# ---------------- DASHBOARD ----------------
+@app.route("/dashboard")
+def dashboard():
+    if "user" not in session:
+        return redirect("/")
+
+    files = os.listdir(UPLOAD_FOLDER)
+    return render_template("dashboard.html", files=files)
+
+# ---------------- ENCRYPT ----------------
+@app.route("/encrypt/<filename>")
+def encrypt(filename):
+    key = request.args.get("key", "").strip()
+
+    if len(key) != 1:
+        return "Key must be 1 character!"
+
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
+    os.system(f"locker.exe encrypt \"{filepath}\" {key}")
+
+    return redirect("/dashboard")
+
+# ---------------- DECRYPT ----------------
+@app.route("/decrypt/<filename>")
+def decrypt(filename):
+    key = request.args.get("key", "").strip()
+
+    if len(key) != 1:
+        return "Key must be 1 character!"
+
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
+
+    if not filename.endswith(".enc"):
+        return "Not an encrypted file!"
+
+    os.system(f"locker.exe decrypt \"{filepath}\" {key}")
+
+    return redirect("/dashboard")
+
+# ---------------- UPLOAD ----------------
+@app.route("/upload", methods=["POST"])
+def upload():
+    file = request.files["file"]
+
+    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(filepath)
+
+    return redirect("/dashboard")
+
+# ---------------- DOWNLOAD ----------------
+@app.route("/download/<filename>")
+def download(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
+
+# ---------------- LOGOUT ----------------
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
+
+
+
+
+
+
+
+
+
+
+locker.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main(int argc, char *argv[]) {
+
+    if(argc < 4) {
+        printf("Usage: locker <encrypt/decrypt> <file> <key>\n");
+        return 1;
+    }
+
+    char *mode = argv[1];
+    char *filename = argv[2];
+    char key = argv[3][0];
+
+    FILE *fp = fopen(filename, "rb");
+    if(fp == NULL) {
+        printf("File not found!\n");
+        return 1;
+    }
+
+    char outputFile[300];
+
+    if(strcmp(mode, "encrypt") == 0) {
+        sprintf(outputFile, "%s.enc", filename);
+    } else {
+        int len = strlen(filename);
+        if(len > 4 && strcmp(filename + len - 4, ".enc") == 0) {
+            strncpy(outputFile, filename, len - 4);
+            outputFile[len - 4] = '\0';
+        } else {
+            sprintf(outputFile, "%s.dec", filename);
+        }
+    }
+
+    FILE *out = fopen(outputFile, "wb");
+
+    int ch;
+    while((ch = fgetc(fp)) != EOF) {
+        fputc(ch ^ key, out);
+    }
+
+    fclose(fp);
+    fclose(out);
+
+    printf("Output: %s\n", outputFile);
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+script.js
+async function encrypt() {
+    const fileInput = document.getElementById("fileInput");
+    const key = document.getElementById("key").value.trim();
+    const status = document.getElementById("status");
+
+    if (!fileInput.files.length) {
+        status.innerText = "Select a file!";
+        return;
+    }
+
+    if (key.length !== 1) {
+        status.innerText = "Enter 1 character key!";
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    formData.append("key", key);
+
+    let res = await fetch("/encrypt", {
+        method: "POST",
+        body: formData
+    });
+
+    status.innerText = await res.text();
+    location.reload(); // refresh file list
+}
+
+async function decrypt() {
+    const fileInput = document.getElementById("fileInput");
+    const key = document.getElementById("key").value.trim();
+    const status = document.getElementById("status");
+
+    if (!fileInput.files.length) {
+        status.innerText = "Select .enc file!";
+        return;
+    }
+
+    if (key.length !== 1) {
+        status.innerText = "Enter 1 character key!";
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    formData.append("key", key);
+
+    let res = await fetch("/decrypt", {
+        method: "POST",
+        body: formData
+    });
+
+    status.innerText = await res.text();
+    location.reload();
+}
+
+
+
+
+
+
+
+
+style.css
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+}
+
+.topbar {
+    background: #1e293b;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.container {
+    padding: 20px;
+}
+
+.upload-box {
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 8px 15px;
+    background: #22c55e;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    background: #1e293b;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+
+.green {
+    background: green;
+    padding: 5px;
+}
+
+.red {
+    background: red;
+    padding: 5px;
+}
+
+
+
+
+
+
+dashboard.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="topbar">
+    <h2>Secure File Locker</h2>
+    <a href="/logout">Logout</a>
+</div>
+
+<div class="container">
+
+    <!-- Upload -->
+    <form action="/upload" method="POST" enctype="multipart/form-data" class="upload-box">
+        <input type="file" name="file">
+        <button type="submit">Upload</button>
+    </form>
+
+    <input type="text" id="key" placeholder="Enter key (1 char)">
+
+    <!-- File List -->
+    <div class="file-list">
+        {% for file in files %}
+        <div class="file-item">
+            <span>{{ file }}</span>
+
+            {% if file.endswith('.enc') %}
+                <span class="red">Encrypted</span>
+                <a href="/decrypt/{{ file }}?key=" onclick="this.href += document.getElementById('key').value">
+                    <button>Decrypt</button>
+                </a>
+            {% else %}
+                <span class="green">Normal</span>
+                <a href="/encrypt/{{ file }}?key=" onclick="this.href += document.getElementById('key').value">
+                    <button>Encrypt</button>
+                </a>
+            {% endif %}
+
+            <a href="/download/{{ file }}"><button>Download</button></a>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+</body>
+</html>
+
+
+
+
+
+login.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <style>
+        body {
+            background: #0f172a;
+            color: white;
+            text-align: center;
+            font-family: Arial;
+            padding-top: 150px;
+        }
+
+        input {
+            padding: 10px;
+            margin: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #22c55e;
+            border: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🔐 Secure Locker Login</h1>
+
+<form method="POST">
+    <input type="text" name="username" placeholder="Username"><br>
+    <input type="password" name="password" placeholder="Password"><br>
+    <button type="submit">Login</button>
+</form>
+
+</body>
+</html>
